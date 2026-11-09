@@ -41,4 +41,4 @@ Sous Windows, pour générer l'APK de développement :
 
 L'APK généré se trouve dans `app/build/outputs/apk/debug/app-debug.apk`. Les fonctions réseau nécessitent une connexion et l'API configurée dans `ApiClient.kt`. La carte utilise les tuiles OpenStreetMap, qui ne sont pas garanties hors ligne.
 
-**APK de distribution et vidéo de démonstration :** liens à ajouter ici lorsqu'ils seront publiés dans une Release GitHub et sur une plateforme vidéo.
+**Télécharger l'APK Android :** [Corsica Soundscape v1.0 (APK de démonstration)](https://github.com/youneshimi/AndroidCorsica-Soundscape/releases/download/v1.0-android-demo/Corsica-Soundscape-v1.0-debug.apk). C'est un APK debug installable sur Android 7.0 ou plus, signé avec une clé de développement ; il n'est pas destiné au Play Store. La vidéo de démonstration sera ajoutée ici lorsqu'elle sera publiée.

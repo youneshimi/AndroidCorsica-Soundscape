@@ -16,6 +16,17 @@ Application Android de carte sonore collaborative de la Corse. Elle permet d'exp
 
 L'interface est développée en **Kotlin, Jetpack Compose et Material 3**, avec **Navigation 3**. La carte utilise **osmdroid** et la lecture audio **Media3**. **Room** est la source de vérité locale ; une outbox et **WorkManager** assurent la synchronisation. **Retrofit/OkHttp** communiquent avec l'API du Worker Cloudflare. Les préférences sont stockées dans **DataStore**. Les dépendances de l'application sont assemblées par `SoundscapeContainer` ; le projet n'utilise pas Hilt.
 
+## Comment fonctionne la synchronisation ?
+
+Il y a deux « workers » distincts : **SyncWorker**, une tâche Android exécutée par WorkManager, et le **Worker Cloudflare**, l'API distante qui enregistre les données dans Supabase.
+
+1. **Ajout d'un son** : l'enregistrement et ses informations sont d'abord sauvegardés localement dans Room. Une entrée dans l'**outbox** indique qu'il faut les envoyer. Le son reste donc disponible dans l'application sans réseau.
+2. **Retour du réseau** : WorkManager lance `SyncWorker` dès qu'une connexion est disponible. Il traite l'outbox, envoie le fichier et les informations à l'API, puis marque le son `SYNCED` et retire l'entrée de l'outbox. L'identifiant d'envoi évite de créer deux sons si une tentative est répétée.
+3. **Suppression d'un son** : la carte passe d'abord à l'état `DELETING` dans Room et affiche « Suppression en attente ». Après les envois, `SyncWorker` appelle `DELETE /api/sounds/:id`. En cas de succès ou si le son est déjà absent du serveur (404), il supprime la ligne locale et le fichier audio local.
+4. **Échec temporaire** : si le réseau ou le serveur échoue, les données en attente restent dans Room. WorkManager réessaie plus tard avec un délai croissant ; le son à supprimer garde son statut visible jusqu'à la réussite.
+
+Le Worker Cloudflare reçoit les requêtes HTTP de l'application et utilise Supabase pour les sons et les fichiers audio. L'app Android ne stocke pas de clé Supabase.
+
 ## Lancer le projet
 
 1. Ouvrir ce dossier dans Android Studio et laisser Gradle synchroniser le projet.
